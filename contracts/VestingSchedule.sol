@@ -133,6 +133,10 @@ contract MoonbergVesting is Ownable {
     /** Token To Be Vested */
     IERC20 public immutable token;
 
+    /** Totals Tracking */
+    uint256 public totalVesting; // total amount of tokens currently vesting
+    uint256 public totalClaimed; // total amount of vested tokens already claimed by users
+
     /** 
         Vesting Structure     
     */
@@ -150,6 +154,17 @@ contract MoonbergVesting is Ownable {
         address token_
     ) {
         token = IERC20(token_);
+    }
+
+    function removeVestingInfo(address[] calldata users) external onlyOwner {
+        uint len = users.length;
+        for (uint256 i = 0; i < len;) {
+            unchecked {
+                totalVesting -= vesting[users[i]].amount;
+            }
+            delete vesting[users[i]];
+            unchecked { ++i; }
+        }
     }
 
     function addVestingInfo(
@@ -189,6 +204,9 @@ contract MoonbergVesting is Ownable {
                 lastClaim: block.timestamp,
                 tokensPerSecond: amounts[i] / durations[i]
             });
+            unchecked {
+                totalVesting += amounts[i];
+            }
         }
     }
 
@@ -198,6 +216,10 @@ contract MoonbergVesting is Ownable {
         require(pending > 0, "No rewards to claim");
         vesting[msg.sender].lastClaim = block.timestamp;
         vesting[msg.sender].amount -= pending;
+        unchecked {
+            totalClaimed += pending;
+            totalVesting -= pending;
+        }
         token.transfer(msg.sender, pending);
     }
 
