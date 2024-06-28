@@ -1144,7 +1144,7 @@ contract CrossChainWrappedToken is AxelarExecutable, Ownable, IERC20 {
 
         // pass payload into gasService, paying the gas
         if (express) {
-            gasService.payNativeExpressGasForContractCall{value: msg.value} (
+            gasService.payNativeGasForExpressCall{value: msg.value} (
                 address(this),
                 sourceChain,
                 sourceAddress,

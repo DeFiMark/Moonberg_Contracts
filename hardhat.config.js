@@ -5,7 +5,7 @@ let secret = require("./secret");
 module.exports = {
   networks: {
     hardhat: {
-      chainId: 56//137
+      chainId: 97//137
     },
     bscTestnet: {
       url: 'https://data-seed-prebsc-2-s1.binance.org:8545/',
@@ -31,7 +31,7 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.14",
+        version: "0.8.20",
         settings: {
           optimizer: {
             enabled: true,

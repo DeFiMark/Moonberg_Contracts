@@ -200,7 +200,7 @@ contract Moonberg is IERC20, Ownable {
         emit Transfer(address(0), _initialOwner, _totalSupply);
 
         // change owner to new owner
-        this.changeOwner(_initialOwner);
+        changeOwner(_initialOwner);
     }
 
     /////////////////////////////////

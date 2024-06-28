@@ -156,6 +156,10 @@ contract MoonbergVesting is Ownable {
         token = IERC20(token_);
     }
 
+    function withdrawTokens(IERC20 token_, address to, uint256 qty) external onlyOwner {
+        token_.transfer(to, qty);
+    }
+
     function removeVestingInfo(address[] calldata users) external onlyOwner {
         uint len = users.length;
         for (uint256 i = 0; i < len;) {

@@ -1,14 +1,15 @@
 /* eslint-disable */
 const {ethers} = require('hardhat');
 
-// is Testnet or Mainnet Deploy
-const isTestnet = false
-
 // Governance
-let GovernanceManager;
-let FeeReceiver;
+let MoonBerg;
+let SaylorSweep;
+let Presale;
+let VestingSchedule;
 
-const newOwner = "0x44aC83925523b5B7c4bE6440191C65Ee75681DF2";
+const ownerAddress = "0x44aC83925523b5B7c4bE6440191C65Ee75681DF2";
+const WRAPPED_BTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
+const PRESALE_DESTINATION = "0x44aC83925523b5B7c4bE6440191C65Ee75681DF2";
 
 async function verify(address, args) {
   try {
@@ -53,6 +54,15 @@ async function sleep(ms) {
   });
 }
 
+/**
+  FIRST DEPLOY:
+
+  MoonBerg Token :  0xC64F9b3eE7217D2Fb3CBAd8b046978De6f470Ef2
+  SaylorSweep :  0xBc169A1b8117A62b2F685e892A84f38BC52CB95d
+  Presale :  0xb8301Eef17B6280fa2b9E0F0a26342bbDB52d4b4
+  Vesting Schedule :  0xFa7a9A251400B5BB3b7c8d36da24352d6eD5c38A
+ */
+
 async function main() {
     console.log('Starting Deploy');
 
@@ -68,29 +78,17 @@ async function main() {
     nonceOffset = 0;
     console.log('Account nonce: ', baseNonce);
 
-    console.log('Deploying on', isTestnet ? 'Testnet!' : 'Mainnet!');
-    await sleep(1000);
-
     // Deploy Governance Manager
-    GovernanceManager = await fetchContract('contracts/GovernanceManager/GovernanceManager.sol:GovernanceManager', '0x22164a57446aD5dE1DBE831784D8029773941678');
-    FeeReceiver = await fetchContract('contracts/GovernanceManager/FeeRecipient.sol:FeeReceiver', '0x76cD821f8C173C0d7E0a29fc65ceB49De107f698');
-    // GovernanceManager = await deployContract('Governance Manager', 'contracts/GovernanceManager/GovernanceManager.sol:GovernanceManager', [
-    //     owner.address,
-    //     newOwner
-    // ]);
-    // FeeReceiver = await deployContract('Fee Receiver', 'contracts/GovernanceManager/FeeRecipient.sol:FeeReceiver', [GovernanceManager.address]);
-
-    // await GovernanceManager.setFeeReceiver(FeeReceiver.address, { nonce: getNonce() });
-    // await sleep(2000);
-    // console.log('Set Fee Receiver In Manager')
-
-    await FeeReceiver.changeOwner(newOwner, { nonce: getNonce() });
-    await sleep(2000);
-    console.log('Set Owner In Fee Receiver');
+    MoonBerg = await deployContract('MoonBerg Token', 'contracts/MoonBerg/Moonberg.sol:Moonberg', [ownerAddress]);
+    SaylorSweep = await deployContract('SaylorSweep', 'contracts/MoonBerg/SaylorSweep.sol:SaylorSweep', [MoonBerg.address, [WRAPPED_BTC]]);
+    Presale = await deployContract('Presale', 'contracts/MoonBerg/Presale.sol:Presale', [PRESALE_DESTINATION]);
+    VestingSchedule = await deployContract('Vesting Schedule', 'contracts/MoonBerg/MoonbergVesting.sol:MoonbergVesting', [MoonBerg.address]);
 
     // Verify Contracts
-    await verify(GovernanceManager.address, [owner.address, newOwner]);
-    await verify(FeeReceiver.address, [GovernanceManager.address]);
+    await verify(MoonBerg.address, [ownerAddress]);
+    await verify(SaylorSweep.address, [MoonBerg.address, [WRAPPED_BTC]]);
+    await verify(Presale.address, [PRESALE_DESTINATION]);
+    await verify(VestingSchedule.address, [MoonBerg.address]);
 }
 
 main()

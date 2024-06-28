@@ -18,7 +18,7 @@ contract Presale is Ownable {
     uint256 private _totalDonated;
 
     // Hard Cap
-    uint256 public hardCap;
+    uint256 public hardCap = 10_000 ether;
     
     // maximum contribution
     uint256 public min_contribution = 0.01 ether;
@@ -31,11 +31,9 @@ contract Presale is Ownable {
     event DonatedETH(address donor, uint256 amountDonated, uint256 totalInSale);
 
     constructor(
-        address _presaleReceiver,
-        uint256 _hardCap
+        address _presaleReceiver
     ) {
         presaleReceiver = _presaleReceiver;
-        hardCap = _hardCap;
     }
 
     function startSale() external onlyOwner {

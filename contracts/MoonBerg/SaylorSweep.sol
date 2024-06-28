@@ -69,18 +69,12 @@ contract SaylorSweep is Ownable, ReentrancyGuard {
         // quote amount out of backing assets
         uint256[] memory amounts = quote(amount);
 
-        // redundantly check total supply
-        uint256 oldTotalSupply = moonberg.totalSupply();
-
         // burn `amount` of moonberg tokens from sender
-        moonberg.burnFrom(msg.sender, amount);
-
-        // redundantly check total supply after burn to ensure everything worked properly
         require(
-            moonberg.totalSupply() == oldTotalSupply - amount,
-            "Burn Failed"
+            moonberg.burnFrom(msg.sender, amount),
+            'Burn Failed'
         );
-
+        
         // determine length of amounts
         uint len = amounts.length;
 
